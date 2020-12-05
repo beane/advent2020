@@ -20,7 +20,6 @@ puts File.readlines('input')
 seat_ids = File.readlines('input')
   .map(&:strip)
   .map { |code| BoardingPass.new(code).seat_id }
-  .sort
 
 puts (seat_ids.min..seat_ids.max).to_a - seat_ids
 
