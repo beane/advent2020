@@ -1,5 +1,4 @@
 require 'set'
-require 'pp'
 
 # part 1
 bags = Hash.new { |h,k| h[k] = Set.new }
@@ -15,16 +14,16 @@ File.readlines('input', chomp: true).each do |full_line|
     .each { |contained| bags[contained] << container }
 end
 
-def container_bags(bags, known_containers, search_term)
-  bags[search_term].each do |color|
-    known_containers << color
-    container_bags(bags, known_containers, color)
-  end
-  known_containers
+def container_bags(bags, search_term)
+  found_containers = bags[search_term]
+  return found_containers if found_containers.empty?
+  containers = found_containers
+    .map { |color| container_bags(bags, color) }
+    .reduce(&:merge)
+  Set.new(found_containers).merge(containers)
 end
 
-# this array is fucked up nested but flatten will save us
-p container_bags(bags, Set.new, 'shiny gold').count
+p container_bags(bags, 'shiny gold').count
 
 # part 2
 bags = Hash.new { |h,k| h[k] = [] }
@@ -43,9 +42,7 @@ File.readlines('input', chomp: true).each do |full_line|
 end
 
 def count_contained_bags(bags, search_term)
-  bags[search_term].map do |color, count|
-    count + count * count_contained_bags(bags, color)
-  end.sum
+  bags[search_term].map { |color, count| count + count * count_contained_bags(bags, color) }.sum
 end
 
 p count_contained_bags(bags, 'shiny gold')
