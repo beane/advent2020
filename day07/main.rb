@@ -15,12 +15,16 @@ File.readlines('input', chomp: true).each do |full_line|
     .each { |contained| bags[contained] << container }
 end
 
-def container_bags(bags, search_term)
-  bags[search_term].map { |color| container_bags(bags, color) << color }
+def container_bags(bags, known_containers, search_term)
+  bags[search_term].each do |color|
+    known_containers << color
+    container_bags(bags, known_containers, color)
+  end
+  known_containers
 end
 
 # this array is fucked up nested but flatten will save us
-p container_bags(bags, 'shiny gold').flatten.uniq.count
+p container_bags(bags, Set.new, 'shiny gold').count
 
 # part 2
 bags = Hash.new { |h,k| h[k] = [] }
