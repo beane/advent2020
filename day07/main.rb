@@ -25,36 +25,26 @@ end
 
 p found.count
 
-# hot garbage below
-#
 # part 2
-# bags = Hash.new { |h,k| h[k] = Hash.new(0) }
-# 
-# File.readlines('input', chomp: true).each do |full_line|
-#   line = full_line
-#     .delete_suffix(" bag.")
-#     .delete_suffix(" bags.")
-#   container, contained = line.split(/ bags contain /)
-#   contained
-#     .split(/ bags?, /)
-#     .each do |contained|
-#       count, bag = contained.split(/ /, 2)
-#       bags[container][bag] += count.to_i
-#     end
-# end
-# 
-# to_search = [["shiny gold", 1]]
-# found = Hash.new 0
-# pp bags
-# 
-# until to_search.empty? do
-#   search = to_search.shift
-#   search_term, container_count = search
-#   to_search.concat bags[search_term].to_a
-#   bags[search_term].each { |color, count| found[color] += container_count * count }
-#   print search_term, ' ', container_count
-#   puts
-#   pp found
-# end
-# 
-# p found.values.sum
+bags = Hash.new { |h,k| h[k] = [] }
+
+File.readlines('input', chomp: true).each do |full_line|
+  line = full_line
+    .delete_suffix(" bag.")
+    .delete_suffix(" bags.")
+  container, contained = line.split(/ bags contain /)
+  contained
+    .split(/ bags?, /)
+    .each do |contained|
+      count, contained_color = contained.split(/ /, 2)
+      bags[container].append([contained_color, count.to_i])
+    end
+end
+
+def count_contained_bags(bags, search_term)
+  bags[search_term].map do |color, count|
+    count + count * count_contained_bags(bags, color)
+  end.sum
+end
+
+p count_contained_bags(bags, 'shiny gold')
