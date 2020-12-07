@@ -1,4 +1,5 @@
 require 'set'
+require 'pp'
 
 # part 1
 bags = Hash.new { |h,k| h[k] = Set.new }
@@ -14,16 +15,12 @@ File.readlines('input', chomp: true).each do |full_line|
     .each { |contained| bags[contained] << container }
 end
 
-to_search = ["shiny gold"]
-found = Set.new
-
-until to_search.empty? do
-  search = to_search.shift
-  to_search.concat bags[search].to_a
-  found.merge bags[search]
+def container_bags(bags, search_term)
+  bags[search_term].map { |color| container_bags(bags, color) << color }
 end
 
-p found.count
+# this array is fucked up nested but flatten will save us
+p container_bags(bags, 'shiny gold').flatten.uniq.count
 
 # part 2
 bags = Hash.new { |h,k| h[k] = [] }
